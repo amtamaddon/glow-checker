@@ -132,14 +132,25 @@ const Index = () => {
                   <p className="text-muted-foreground mb-6">
                     Start by adding your current products and get personalized recommendations for the perfect routine.
                   </p>
-                  <Button 
-                    size="lg"
-                    className="bg-accent hover:bg-accent/90 text-accent-foreground btn-hover-effect"
-                    onClick={() => navigate("/analyze")}
-                  >
-                    <Search className="mr-2 h-4 w-4" />
-                    Analyze Your Products
-                  </Button>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Button 
+                      size="lg"
+                      className="bg-accent hover:bg-accent/90 text-accent-foreground btn-hover-effect"
+                      onClick={() => navigate("/analyze")}
+                    >
+                      <Search className="mr-2 h-4 w-4" />
+                      Analyze Your Products
+                    </Button>
+                    <Button 
+                      size="lg"
+                      variant="outline"
+                      className="border-accent text-foreground hover:bg-accent/10 btn-hover-effect"
+                      onClick={() => navigate("/routines")}
+                    >
+                      <Calendar className="mr-2 h-4 w-4" />
+                      Build Your Routine
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

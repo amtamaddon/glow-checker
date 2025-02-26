@@ -7,10 +7,12 @@ import ProductCard, { ProductCardDetailed } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Plus, Search, X, Droplet } from "lucide-react";
+import { Plus, Search, X, Droplet, Import } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import ProductInput from "@/components/ProductInput";
 import IngredientAnalysis from "@/components/IngredientAnalysis";
+import AIAnalysis from "@/components/AIAnalysis";
+import ImportProducts from "@/components/ImportProducts";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
@@ -20,6 +22,7 @@ const Analyze = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [isImportingProducts, setIsImportingProducts] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   
   useEffect(() => {
@@ -42,6 +45,19 @@ const Analyze = () => {
     toast({
       title: "Product added",
       description: "Your product has been added to your collection"
+    });
+  };
+  
+  const handleImportProducts = (importedProducts: Product[]) => {
+    if (importedProducts.length === 0) return;
+    
+    setProducts([...products, ...importedProducts]);
+    setIsImportingProducts(false);
+    setSelectedProduct(importedProducts[0]);
+    
+    toast({
+      title: `${importedProducts.length} products imported`,
+      description: "The products have been added to your collection"
     });
   };
   
@@ -80,20 +96,37 @@ const Analyze = () => {
             <div className="lg:col-span-1 space-y-6">
               <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-medium">Your Products</h1>
-                <Dialog open={isAddingProduct} onOpenChange={setIsAddingProduct}>
-                  <DialogTrigger asChild>
-                    <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add New
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-xl">
-                    <DialogHeader>
-                      <DialogTitle>Add New Product</DialogTitle>
-                    </DialogHeader>
-                    <ProductInput onAddProduct={handleAddProduct} />
-                  </DialogContent>
-                </Dialog>
+                <div className="flex space-x-2">
+                  <Dialog open={isImportingProducts} onOpenChange={setIsImportingProducts}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline">
+                        <Import className="h-4 w-4 mr-2" />
+                        Import
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-3xl">
+                      <DialogHeader>
+                        <DialogTitle>Import Products</DialogTitle>
+                      </DialogHeader>
+                      <ImportProducts onImport={handleImportProducts} />
+                    </DialogContent>
+                  </Dialog>
+                  
+                  <Dialog open={isAddingProduct} onOpenChange={setIsAddingProduct}>
+                    <DialogTrigger asChild>
+                      <Button className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add New
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-xl">
+                      <DialogHeader>
+                        <DialogTitle>Add New Product</DialogTitle>
+                      </DialogHeader>
+                      <ProductInput onAddProduct={handleAddProduct} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
               
               <div className="relative">
@@ -151,16 +184,27 @@ const Analyze = () => {
                         ? "Try a different search term" 
                         : "Add your first product to get started"}
                     </p>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => {
-                        setSearchTerm("");
-                        setIsAddingProduct(true);
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Product
-                    </Button>
+                    <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          setSearchTerm("");
+                          setIsImportingProducts(true);
+                        }}
+                      >
+                        <Import className="h-4 w-4 mr-2" />
+                        Import Products
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          setSearchTerm("");
+                          setIsAddingProduct(true);
+                        }}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Manually
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -190,7 +234,18 @@ const Analyze = () => {
                   
                   <ProductCardDetailed product={selectedProduct} />
                   
-                  <IngredientAnalysis product={selectedProduct} />
+                  <Tabs defaultValue="ingredients">
+                    <TabsList>
+                      <TabsTrigger value="ingredients">Ingredient Analysis</TabsTrigger>
+                      <TabsTrigger value="ai">AI Analysis</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="ingredients" className="mt-4">
+                      <IngredientAnalysis product={selectedProduct} />
+                    </TabsContent>
+                    <TabsContent value="ai" className="mt-4">
+                      <AIAnalysis product={selectedProduct} />
+                    </TabsContent>
+                  </Tabs>
                 </motion.div>
               ) : (
                 <div className="h-full flex items-center justify-center">

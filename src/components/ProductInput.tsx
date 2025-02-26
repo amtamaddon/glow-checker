@@ -18,6 +18,8 @@ interface ProductInputProps {
   onAddProduct: (product: Omit<Product, "id">) => void;
 }
 
+type RoutineType = "morning" | "evening";
+
 const routineSteps = {
   morning: [
     { step: 1, name: "Cleanser", category: "cleanser" },
@@ -41,7 +43,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
   const [tab, setTab] = useState("examples");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
-  const [selectedRoutine, setSelectedRoutine] = useState<"morning" | "evening">("morning");
+  const [selectedRoutine, setSelectedRoutine] = useState<RoutineType>("morning");
   const [loading, setLoading] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -54,7 +56,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
     category: "",
     description: "",
     ingredients: "",
-    routines: [] as ("morning" | "evening")[],
+    routines: [] as RoutineType[],
   });
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -137,7 +139,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
       category: "cleanser",
       description: "Gentle, hydrating cleanser for normal to dry skin",
       ingredients: "Ceramides, Hyaluronic Acid, Glycerin",
-      routines: ["morning", "evening"],
+      routines: ["morning", "evening"], // This is now correctly typed as RoutineType[]
     });
   };
 
@@ -153,7 +155,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
         category: "cleanser",
         description: "Details extracted from image",
         ingredients: "Detected ingredients",
-        routines: ["morning"],
+        routines: ["morning"], // This is now correctly typed as RoutineType[]
       });
     }
   };

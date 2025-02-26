@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -201,6 +200,21 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
       title: "Products added",
       description: `${selectedProducts.length} products have been added to your collection`
     });
+  };
+
+  const updateRoutines = (routine: RoutineType) => {
+    const currentRoutines = formData.routines;
+    if (currentRoutines.includes(routine)) {
+      setFormData({
+        ...formData,
+        routines: currentRoutines.filter((r): r is RoutineType => r !== routine)
+      });
+    } else {
+      setFormData({
+        ...formData,
+        routines: [...currentRoutines, routine]
+      });
+    }
   };
 
   return (
@@ -418,12 +432,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
                     type="button"
                     variant={formData.routines.includes("morning") ? "default" : "outline"}
                     size="sm"
-                    onClick={() => {
-                      const newRoutines = formData.routines.includes("morning")
-                        ? formData.routines.filter(r => r !== "morning")
-                        : [...formData.routines, "morning"];
-                      setFormData({ ...formData, routines: newRoutines });
-                    }}
+                    onClick={() => updateRoutines("morning")}
                   >
                     Morning
                   </Button>
@@ -431,12 +440,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
                     type="button"
                     variant={formData.routines.includes("evening") ? "default" : "outline"}
                     size="sm"
-                    onClick={() => {
-                      const newRoutines = formData.routines.includes("evening")
-                        ? formData.routines.filter(r => r !== "evening")
-                        : [...formData.routines, "evening"];
-                      setFormData({ ...formData, routines: newRoutines });
-                    }}
+                    onClick={() => updateRoutines("evening")}
                   >
                     Evening
                   </Button>

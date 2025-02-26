@@ -139,7 +139,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
       category: "cleanser",
       description: "Gentle, hydrating cleanser for normal to dry skin",
       ingredients: "Ceramides, Hyaluronic Acid, Glycerin",
-      routines: ["morning", "evening"], // This is now correctly typed as RoutineType[]
+      routines: ["morning", "evening"] as RoutineType[],
     });
   };
 
@@ -155,7 +155,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
         category: "cleanser",
         description: "Details extracted from image",
         ingredients: "Detected ingredients",
-        routines: ["morning"], // This is now correctly typed as RoutineType[]
+        routines: ["morning"] as RoutineType[],
       });
     }
   };
@@ -188,7 +188,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
         imageUrl: product.imageUrl,
         description: product.description,
         ingredients: product.ingredients,
-        routines: product.routines,
+        routines: product.routines as RoutineType[], // Added type assertion
       });
     });
     setSelectedProductIds(new Set());

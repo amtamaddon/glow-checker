@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Product, modaOperandiProducts, checkContraindications } from "@/lib/productData";
 import Header from "@/components/Header";
@@ -11,12 +11,15 @@ import { Plus, Search, X, Droplet, AlertTriangle, Check } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import ProductInput from "@/components/ProductInput";
 import IngredientAnalysis from "@/components/IngredientAnalysis";
-import AIAnalysis from "@/components/AIAnalysis";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy load the AIAnalysis component since it makes API calls
+const AIAnalysis = lazy(() => import("@/components/AIAnalysis"));
 
 const Analyze = () => {
   const { toast } = useToast();
@@ -25,23 +28,42 @@ const Analyze = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const [analysisTab, setAnalysisTab] = useState("ingredients");
   const [contraindications, setContraindications] = useState<ReturnType<typeof checkContraindications> | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   
   // Fill with Moda Operandi products initially, but only 1 of each category
   useEffect(() => {
-    if (products.length === 0) {
-      const categories: Record<string, boolean> = {};
-      const initialProducts: Product[] = [];
-      
-      modaOperandiProducts.forEach(product => {
-        if (!categories[product.category]) {
-          initialProducts.push({...product, id: uuidv4()});
-          categories[product.category] = true;
+    const initializeProducts = () => {
+      if (products.length === 0) {
+        setIsLoading(true);
+        try {
+          const categories: Record<string, boolean> = {};
+          const initialProducts: Product[] = [];
+          
+          modaOperandiProducts.forEach(product => {
+            if (!categories[product.category]) {
+              initialProducts.push({...product, id: uuidv4()});
+              categories[product.category] = true;
+            }
+          });
+          
+          setProducts(initialProducts);
+          
+          // Add a small delay to prevent rendering bottlenecks on mobile
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 50);
+        } catch (error) {
+          console.error("Error initializing products:", error);
+          setIsLoading(false);
         }
-      });
-      
-      setProducts(initialProducts);
-    }
+      } else {
+        setIsLoading(false);
+      }
+    };
+    
+    initializeProducts();
   }, [products.length]);
   
   // Select first product when products change
@@ -101,6 +123,9 @@ const Analyze = () => {
     return matchesSearch && matchesCategory;
   });
   
+  // Limit products displayed to improve performance
+  const displayedProducts = filteredProducts.slice(0, 10);
+  
   const getModaProductsByCategory = (category: string) => {
     return modaOperandiProducts.filter(p => p.category === category).slice(0, 4);
   };
@@ -119,7 +144,7 @@ const Analyze = () => {
       }
     });
     
-    return suggestions;
+    return suggestions.slice(0, 2);
   };
   
   return (
@@ -208,15 +233,29 @@ const Analyze = () => {
               )}
               
               <div className="space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-2">
-                {filteredProducts.length > 0 ? (
-                  <AnimatePresence>
-                    {filteredProducts.map((product, index) => (
+                {isLoading ? (
+                  // Loading state for products list
+                  Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="border rounded-lg p-3">
+                      <div className="flex items-start gap-3">
+                        <Skeleton className="h-16 w-16 rounded-md" />
+                        <div className="flex-1">
+                          <Skeleton className="h-4 w-3/4 mb-2" />
+                          <Skeleton className="h-3 w-1/2 mb-2" />
+                          <Skeleton className="h-5 w-1/4" />
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : displayedProducts.length > 0 ? (
+                  <AnimatePresence initial={false}>
+                    {displayedProducts.map((product, index) => (
                       <motion.div
                         key={product.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
+                        transition={{ duration: 0.2, delay: Math.min(index * 0.05, 0.3) }}
                       >
                         <ProductCard 
                           product={product} 
@@ -243,14 +282,14 @@ const Analyze = () => {
                 )}
               </div>
               
-              {filteredProducts.length > 0 && !searchTerm && activeTab === "all" && getSuggestedProducts().length > 0 && (
+              {!isLoading && filteredProducts.length > 0 && !searchTerm && activeTab === "all" && getSuggestedProducts().length > 0 && (
                 <div>
                   <h3 className="text-sm font-medium mb-2 flex items-center text-muted-foreground">
                     <Check className="h-4 w-4 mr-1 text-accent" />
                     Suggested Products to Add
                   </h3>
                   <div className="grid grid-cols-2 gap-2">
-                    {getSuggestedProducts().slice(0, 2).map((product, index) => (
+                    {getSuggestedProducts().map((product, index) => (
                       <div 
                         key={index}
                         className="flex flex-col gap-1 p-2 border rounded-md hover:border-accent cursor-pointer"
@@ -303,7 +342,11 @@ const Analyze = () => {
                   
                   <ProductCardDetailed product={selectedProduct} />
                   
-                  <Tabs defaultValue="ingredients">
+                  <Tabs 
+                    defaultValue="ingredients" 
+                    value={analysisTab}
+                    onValueChange={setAnalysisTab}
+                  >
                     <TabsList>
                       <TabsTrigger value="ingredients">Ingredient Analysis</TabsTrigger>
                       <TabsTrigger value="ai">AI Analysis</TabsTrigger>
@@ -312,7 +355,20 @@ const Analyze = () => {
                       <IngredientAnalysis product={selectedProduct} />
                     </TabsContent>
                     <TabsContent value="ai" className="mt-4">
-                      <AIAnalysis product={selectedProduct} />
+                      <Suspense fallback={
+                        <Card className="w-full p-6">
+                          <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                              <Skeleton className="h-6 w-6 rounded-full" />
+                              <Skeleton className="h-6 w-64" />
+                            </div>
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-32 w-full" />
+                          </div>
+                        </Card>
+                      }>
+                        <AIAnalysis product={selectedProduct} />
+                      </Suspense>
                     </TabsContent>
                   </Tabs>
                 </motion.div>
@@ -327,41 +383,60 @@ const Analyze = () => {
                   </div>
                   
                   <div className="space-y-6">
-                    {["cleanser", "serum", "moisturizer", "treatment"].map(category => (
-                      <div key={category}>
-                        <h3 className="text-lg font-medium mb-3 capitalize">Popular {category}s</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          {getModaProductsByCategory(category).map((product, index) => (
-                            <div 
-                              key={index}
-                              className="border rounded-md p-3 hover:border-accent cursor-pointer transition-all"
-                              onClick={() => {
-                                handleAddProduct({
-                                  name: product.name,
-                                  brand: product.brand,
-                                  category: product.category,
-                                  imageUrl: product.imageUrl,
-                                  description: product.description,
-                                  ingredients: product.ingredients,
-                                  routines: product.routines,
-                                  rating: product.rating
-                                });
-                              }}
-                            >
-                              <div className="h-20 w-full rounded-md bg-secondary flex-shrink-0 overflow-hidden mb-2">
-                                <img
-                                  src={product.imageUrl}
-                                  alt={product.name}
-                                  className="h-full w-full object-cover"
-                                />
+                    {isLoading ? (
+                      // Loading skeleton for popular products
+                      Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="space-y-3">
+                          <Skeleton className="h-6 w-40 mb-2" />
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            {Array.from({ length: 4 }).map((_, j) => (
+                              <div key={j} className="border rounded-md p-3">
+                                <Skeleton className="h-20 w-full mb-2" />
+                                <Skeleton className="h-3 w-full mb-1" />
+                                <Skeleton className="h-3 w-3/4" />
                               </div>
-                              <p className="text-xs font-medium line-clamp-1">{product.name}</p>
-                              <p className="text-xs text-muted-foreground">{product.brand}</p>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      ["cleanser", "serum", "moisturizer"].map(category => (
+                        <div key={category}>
+                          <h3 className="text-lg font-medium mb-3 capitalize">Popular {category}s</h3>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            {getModaProductsByCategory(category).map((product, index) => (
+                              <div 
+                                key={index}
+                                className="border rounded-md p-3 hover:border-accent cursor-pointer transition-all"
+                                onClick={() => {
+                                  handleAddProduct({
+                                    name: product.name,
+                                    brand: product.brand,
+                                    category: product.category,
+                                    imageUrl: product.imageUrl,
+                                    description: product.description,
+                                    ingredients: product.ingredients,
+                                    routines: product.routines,
+                                    rating: product.rating
+                                  });
+                                }}
+                              >
+                                <div className="h-20 w-full rounded-md bg-secondary flex-shrink-0 overflow-hidden mb-2">
+                                  <img
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    className="h-full w-full object-cover"
+                                    loading="lazy"
+                                  />
+                                </div>
+                                <p className="text-xs font-medium line-clamp-1">{product.name}</p>
+                                <p className="text-xs text-muted-foreground">{product.brand}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </div>
               )}

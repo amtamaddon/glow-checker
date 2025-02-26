@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { Product, modaOperandiProducts, getRoutineOrder } from "@/lib/productData";
+import { Product, getRoutineOrder } from "@/lib/productData";
 import Header from "@/components/Header";
 import RoutineBuilder from "@/components/RoutineBuilder";
 import ProductCard from "@/components/ProductCard";
@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const Routines = () => {
   const { toast } = useToast();
   // Changed from sampleProducts to modaOperandiProducts
-  const [products, setProducts] = useState<Product[]>(modaOperandiProducts);
+  const [products, setProducts] = useState<Product[]>([]);
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [selectedRoutine, setSelectedRoutine] = useState<"morning" | "evening">("morning");
   const [showRecommendations, setShowRecommendations] = useState(false);

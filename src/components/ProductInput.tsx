@@ -133,13 +133,17 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
     stopCamera();
     setLoading(false);
     setTab("manual");
+    
+    // Fixed: explicitly providing the correct types in the array literal
+    const captureRoutines: RoutineType[] = ["morning", "evening"];
+    
     setFormData({
       name: "Hydrating Facial Cleanser",
       brand: "CeraVe",
       category: "cleanser",
       description: "Gentle, hydrating cleanser for normal to dry skin",
       ingredients: "Ceramides, Hyaluronic Acid, Glycerin",
-      routines: ["morning", "evening"] as RoutineType[],
+      routines: captureRoutines,
     });
   };
 
@@ -149,13 +153,17 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
       // In a real app, this would process the image and extract product information
       // For now, we'll simulate finding a product
       setTab("manual");
+      
+      // Fixed: explicitly providing the correct types in the array literal
+      const uploadRoutines: RoutineType[] = ["morning"];
+      
       setFormData({
         name: "Uploaded Product",
         brand: "Detected Brand",
         category: "cleanser",
         description: "Details extracted from image",
         ingredients: "Detected ingredients",
-        routines: ["morning"] as RoutineType[],
+        routines: uploadRoutines,
       });
     }
   };
@@ -181,6 +189,9 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
   const handleAddSelected = () => {
     const selectedProducts = filteredProducts.filter(p => selectedProductIds.has(p.id));
     selectedProducts.forEach(product => {
+      // Ensure product.routines is properly typed for the onAddProduct call
+      const typedRoutines: RoutineType[] = product.routines.map(r => r as RoutineType);
+      
       onAddProduct({
         name: product.name,
         brand: product.brand,
@@ -188,7 +199,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
         imageUrl: product.imageUrl,
         description: product.description,
         ingredients: product.ingredients,
-        routines: product.routines as RoutineType[], // Added type assertion
+        routines: typedRoutines,
       });
     });
     setSelectedProductIds(new Set());

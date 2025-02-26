@@ -3,15 +3,15 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Droplet, Search, Calendar, Plus, ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import Header from "@/components/Header";
 import CTASection from "./components/CTASection";
 import Footer from "./components/Footer";
+import { cn } from "@/lib/utils";
 
 const Index = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   
   useEffect(() => {
     const handleScroll = () => {
@@ -19,6 +19,8 @@ const Index = () => {
     };
     
     window.addEventListener("scroll", handleScroll);
+    setIsLoaded(true);
+    
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   
@@ -33,31 +35,26 @@ const Index = () => {
           
           <div className="container max-w-6xl mx-auto px-4 py-20 md:py-32">
             <div className="max-w-3xl mx-auto text-center">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-              >
+              <div className={cn(
+                "transition-all duration-700 ease-out",
+                isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              )}>
                 <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
                   Check if your skincare products actually <span className="text-accent">work</span>
                 </h1>
-              </motion.div>
+              </div>
               
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="mt-6 text-lg leading-relaxed text-muted-foreground"
-              >
+              <p className={cn(
+                "mt-6 text-lg leading-relaxed text-muted-foreground transition-all duration-700 delay-200 ease-out",
+                isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              )}>
                 Analyze ingredients, build effective routines, and discover what truly benefits your skin without wasting money on ineffective products.
-              </motion.p>
+              </p>
               
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-                className="mt-8 flex flex-col sm:flex-row gap-4 justify-center"
-              >
+              <div className={cn(
+                "mt-8 flex flex-col sm:flex-row gap-4 justify-center transition-all duration-700 delay-400 ease-out",
+                isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              )}>
                 <Button 
                   size="lg"
                   className="bg-accent hover:bg-accent/90 text-accent-foreground btn-hover-effect"
@@ -75,7 +72,7 @@ const Index = () => {
                   <Calendar className="mr-2 h-4 w-4" />
                   Build a Routine
                 </Button>
-              </motion.div>
+              </div>
             </div>
           </div>
         </section>
@@ -92,13 +89,13 @@ const Index = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {features.map((feature, index) => (
-                <motion.div
+                <div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="glass-card p-6 rounded-xl"
+                  className={cn(
+                    "glass-card p-6 rounded-xl transition-all duration-700 ease-out",
+                    isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
+                    `delay-[${index * 200}ms]`
+                  )}
                 >
                   <div className={cn(
                     "w-12 h-12 rounded-lg flex items-center justify-center mb-4",
@@ -116,7 +113,7 @@ const Index = () => {
                     Learn more
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </Button>
-                </motion.div>
+                </div>
               ))}
             </div>
           </div>

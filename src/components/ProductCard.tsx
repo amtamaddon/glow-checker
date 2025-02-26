@@ -39,24 +39,6 @@ const ProductCard = ({ product, onClick, isSelected = false }: ProductCardProps)
       )}
       onClick={onClick}
     >
-      <div className="aspect-square overflow-hidden relative">
-        {!imageLoaded && (
-          <div className="absolute inset-0 bg-secondary animate-pulse flex items-center justify-center">
-            <Droplet className="h-8 w-8 text-muted-foreground/50 animate-bounce" />
-          </div>
-        )}
-        <img 
-          src={product.imageUrl} 
-          alt={product.name}
-          className={cn(
-            "w-full h-full object-cover transition-all duration-500 ease-out",
-            "group-hover:scale-105",
-            imageLoaded ? "opacity-100" : "opacity-0"
-          )}
-          onLoad={() => setImageLoaded(true)}
-        />
-      </div>
-      
       <div className="p-4 space-y-2">
         <div className="flex items-start justify-between">
           <div>
@@ -105,18 +87,21 @@ export const ProductCardDetailed = ({ product }: { product: Product }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="aspect-square relative overflow-hidden">
           {!imageLoaded && (
-            <div className="absolute inset-0 bg-secondary animate-pulse flex items-center justify-center">
-              <Droplet className="h-10 w-10 text-muted-foreground/50 animate-bounce" />
+            <div className="absolute inset-0 bg-secondary flex items-center justify-center">
+              <Droplet className="h-10 w-10 text-muted-foreground/50" />
             </div>
           )}
           <img 
             src={product.imageUrl} 
             alt={product.name}
+            width="300"
+            height="300"
             className={cn(
               "w-full h-full object-cover",
               imageLoaded ? "opacity-100" : "opacity-0"
             )}
             onLoad={() => setImageLoaded(true)}
+            loading="eager" // Load this image immediately since it's important
           />
         </div>
         

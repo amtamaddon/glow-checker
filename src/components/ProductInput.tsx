@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Camera, Upload, RotateCw, Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Product, modaOperandiProducts } from "@/lib/productData";
+import { Product, modaOperandiProducts, RoutineType } from "@/lib/productData";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
@@ -17,8 +17,6 @@ import { Badge } from "@/components/ui/badge";
 interface ProductInputProps {
   onAddProduct: (product: Omit<Product, "id">) => void;
 }
-
-type RoutineType = "morning" | "evening";
 
 const routineSteps = {
   morning: [
@@ -134,7 +132,6 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
     setLoading(false);
     setTab("manual");
     
-    // Fixed: explicitly providing the correct types in the array literal
     const captureRoutines: RoutineType[] = ["morning", "evening"];
     
     setFormData({
@@ -154,7 +151,6 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
       // For now, we'll simulate finding a product
       setTab("manual");
       
-      // Fixed: explicitly providing the correct types in the array literal
       const uploadRoutines: RoutineType[] = ["morning"];
       
       setFormData({
@@ -189,9 +185,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
   const handleAddSelected = () => {
     const selectedProducts = filteredProducts.filter(p => selectedProductIds.has(p.id));
     selectedProducts.forEach(product => {
-      // Ensure product.routines is properly typed for the onAddProduct call
-      const typedRoutines: RoutineType[] = product.routines.map(r => r as RoutineType);
-      
+      // No need for mapping here since types now perfectly match
       onAddProduct({
         name: product.name,
         brand: product.brand,
@@ -199,7 +193,7 @@ const ProductInput = ({ onAddProduct }: ProductInputProps) => {
         imageUrl: product.imageUrl,
         description: product.description,
         ingredients: product.ingredients,
-        routines: typedRoutines,
+        routines: product.routines,
       });
     });
     setSelectedProductIds(new Set());

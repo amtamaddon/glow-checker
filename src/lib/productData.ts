@@ -1,4 +1,6 @@
 
+export type RoutineType = "morning" | "evening";
+
 export interface Ingredient {
   name: string;
   purpose: string;
@@ -14,7 +16,7 @@ export interface Product {
   imageUrl: string;
   description: string;
   ingredients: Ingredient[];
-  routines: ("morning" | "evening")[];
+  routines: RoutineType[];
   rating?: number;
 }
 
@@ -341,7 +343,7 @@ export const analyzeIngredients = (ingredients: Ingredient[]): {
 };
 
 // Function to get recommended routine order
-export const getRoutineOrder = (products: Product[], time: "morning" | "evening"): Product[] => {
+export const getRoutineOrder = (products: Product[], time: RoutineType): Product[] => {
   // Filter products for the specific routine time
   const routineProducts = products.filter(product => 
     product.routines.includes(time)

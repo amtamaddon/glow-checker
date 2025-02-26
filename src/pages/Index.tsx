@@ -1,130 +1,93 @@
 
-import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Droplet, Search, Calendar, Plus, ArrowRight } from "lucide-react";
-import Header from "@/components/Header";
-import CTASection from "./components/CTASection";
-import Footer from "./components/Footer";
+import { Droplet, Search, Calendar, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [scrolled, setScrolled] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10);
-    };
-    
-    window.addEventListener("scroll", handleScroll);
-    setIsLoaded(true);
-    
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
   
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Simple Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 py-4 px-6 bg-background/80 backdrop-blur-sm shadow-sm">
+        <div className="container max-w-6xl mx-auto">
+          <div className="flex items-center">
+            <div className="text-2xl font-semibold flex items-center gap-2">
+              <Droplet className="h-6 w-6 text-accent" />
+              <span className="font-serif">glow</span>
+              <span className="text-muted-foreground">checker</span>
+            </div>
+          </div>
+        </div>
+      </header>
       
-      <main className="flex-1 pt-16">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-accent/10 to-secondary/10 -z-10" />
-          
-          <div className="container max-w-6xl mx-auto px-4 py-20 md:py-32">
-            <div className="max-w-3xl mx-auto text-center">
-              <div className={cn(
-                "transition-all duration-700 ease-out",
-                isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              )}>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight leading-tight">
-                  Check if your skincare products actually <span className="text-accent">work</span>
-                </h1>
-              </div>
-              
-              <p className={cn(
-                "mt-6 text-lg leading-relaxed text-muted-foreground transition-all duration-700 delay-200 ease-out",
-                isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              )}>
-                Analyze ingredients, build effective routines, and discover what truly benefits your skin without wasting money on ineffective products.
-              </p>
-              
-              <div className={cn(
-                "mt-8 flex flex-col sm:flex-row gap-4 justify-center transition-all duration-700 delay-400 ease-out",
-                isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              )}>
-                <Button 
-                  size="lg"
-                  className="bg-accent hover:bg-accent/90 text-accent-foreground btn-hover-effect"
-                  onClick={() => navigate("/analyze")}
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Your Products
-                </Button>
-                <Button 
-                  size="lg"
-                  variant="outline"
-                  className="border-accent text-foreground hover:bg-accent/10 btn-hover-effect"
-                  onClick={() => navigate("/routines")}
-                >
-                  <Calendar className="mr-2 h-4 w-4" />
-                  Build a Routine
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
-        
-        {/* Features Section */}
-        <section className="py-20 bg-secondary/30">
-          <div className="container max-w-6xl mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-medium">How It Works</h2>
-              <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
-                GlowChecker makes it easy to understand what's in your products and how to use them effectively
-              </p>
-            </div>
+      <main className="flex-1 pt-24 pb-10">
+        <div className="container max-w-6xl mx-auto px-4">
+          {/* Simple Hero Section */}
+          <div className="text-center mb-12">
+            <h1 className="text-3xl md:text-4xl font-medium">
+              Check if your skincare products actually <span className="text-accent">work</span>
+            </h1>
+            <p className="mt-4 text-muted-foreground max-w-2xl mx-auto">
+              Analyze ingredients, build effective routines, and discover what truly benefits your skin.
+            </p>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {features.map((feature, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "glass-card p-6 rounded-xl transition-all duration-700 ease-out",
-                    isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4",
-                    `delay-[${index * 200}ms]`
-                  )}
-                >
-                  <div className={cn(
-                    "w-12 h-12 rounded-lg flex items-center justify-center mb-4",
-                    feature.bgColor
-                  )}>
-                    <feature.icon className={cn("h-6 w-6", feature.iconColor)} />
-                  </div>
-                  <h3 className="text-xl font-medium mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
-                  <Button 
-                    variant="link" 
-                    className="mt-4 p-0 h-auto text-foreground hover:text-accent"
-                    onClick={() => navigate(feature.path)}
-                  >
-                    Learn more
-                    <ArrowRight className="ml-1 h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+              <Button 
+                onClick={() => navigate("/analyze")}
+                className="bg-accent hover:bg-accent/90 text-accent-foreground"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Add Products
+              </Button>
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/routines")}
+                className="border-accent text-foreground hover:bg-accent/10"
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                Build Routine
+              </Button>
             </div>
           </div>
-        </section>
-        
-        {/* CTA Section */}
-        <CTASection navigate={navigate} />
+          
+          {/* Simple Features */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <div
+                key={index}
+                className="border p-5 rounded-lg bg-card"
+              >
+                <div className={cn(
+                  "w-10 h-10 rounded-lg flex items-center justify-center mb-3",
+                  feature.bgColor
+                )}>
+                  <feature.icon className={cn("h-5 w-5", feature.iconColor)} />
+                </div>
+                <h3 className="text-lg font-medium mb-2">{feature.title}</h3>
+                <p className="text-sm text-muted-foreground">{feature.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
       
-      {/* Footer */}
-      <Footer />
+      {/* Simple Footer */}
+      <footer className="border-t py-5">
+        <div className="container max-w-6xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center gap-2 mb-3 md:mb-0">
+              <Droplet className="h-4 w-4 text-accent" />
+              <span className="font-serif">glow</span>
+              <span className="text-muted-foreground">checker</span>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} GlowChecker
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
@@ -132,7 +95,7 @@ const Index = () => {
 const features = [
   {
     title: "Analyze Ingredients",
-    description: "Scan or input your product ingredients to understand what's beneficial and what might be causing issues.",
+    description: "Understand what's beneficial and what might be causing issues.",
     icon: Search,
     bgColor: "bg-cyan-100",
     iconColor: "text-cyan-700",
@@ -140,7 +103,7 @@ const features = [
   },
   {
     title: "Build Your Routine",
-    description: "Create personalized morning and evening routines with the optimal order for maximum efficacy.",
+    description: "Create personalized routines with optimal order for maximum efficacy.",
     icon: Calendar,
     bgColor: "bg-accent/30",
     iconColor: "text-accent-foreground",
@@ -148,7 +111,7 @@ const features = [
   },
   {
     title: "Track Results",
-    description: "Monitor your skin's progress and adjust your routine based on what's working for your unique needs.",
+    description: "Monitor your skin's progress and adjust your routine.",
     icon: Droplet,
     bgColor: "bg-amber-100",
     iconColor: "text-amber-700",
